@@ -9,12 +9,14 @@ namespace HotelBooking.Core
     {
         private IRepository<Booking> bookingRepository;
         private IRepository<Room> roomRepository;
+        private readonly SystemTime time;
 
         // Constructor injection
-        public BookingManager(IRepository<Booking> bookingRepository, IRepository<Room> roomRepository)
+        public BookingManager(IRepository<Booking> bookingRepository, IRepository<Room> roomRepository, SystemTime? time = null)
         {
             this.bookingRepository = bookingRepository;
             this.roomRepository = roomRepository;
+            this.time = time ?? new SystemTime();
         }
 
         public async Task<bool> CreateBooking(Booking booking)
@@ -36,7 +38,7 @@ namespace HotelBooking.Core
 
         public async Task<int> FindAvailableRoom(DateTime startDate, DateTime endDate)
         {
-            if (startDate <= DateTime.Today || startDate > endDate)
+            if (startDate <= time.Today || startDate > endDate)
                 throw new ArgumentException("The start date cannot be in the past or later than the end date.");
 
             var bookings = await bookingRepository.GetAllAsync();
@@ -45,8 +47,8 @@ namespace HotelBooking.Core
             foreach (var room in rooms)
             {
                 var activeBookingsForCurrentRoom = activeBookings.Where(b => b.RoomId == room.Id);
-                if (activeBookingsForCurrentRoom.All(b => startDate < b.StartDate &&
-                    endDate < b.StartDate || startDate > b.EndDate && endDate > b.EndDate))
+                if (activeBookingsForCurrentRoom.All(b => startDate <= b.StartDate &&
+                    endDate < b.StartDate || startDate > b.EndDate && endDate >= b.EndDate))
                 {
                     return room.Id;
                 }
