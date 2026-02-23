@@ -74,6 +74,19 @@ namespace HotelBooking.UnitTests
             await Assert.ThrowsAsync<ArgumentException>(result);
         }
 
+        [Theory]
+        [InlineData("2026-01-02", "2026-01-02")]
+        [InlineData("2026-01-02", "2026-01-03")]
+        [InlineData("2026-01-02", "2026-01-01")]
+        public async Task FindAvailableRoom_InvalidDates_ThrowsArgumentException_DataDriven(string start, string end)
+        {
+            var startDate = DateTime.Parse(start);
+            var endDate = DateTime.Parse(end);
+
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                bookingManager.FindAvailableRoom(startDate, endDate));
+        }
+
         [Fact]
         public async Task FindAvailableRoom_RoomAvailable_RoomIdNotMinusOne()
         {
