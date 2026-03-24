@@ -17,7 +17,7 @@ namespace HotelBooking.UiTesting
         [Fact]
         public void HomePage_Should_Show_Title()
         {
-            _driver.Navigate().GoToUrl("https://localhost:44360");
+            _driver.Navigate().GoToUrl("https://localhost:5001");
             Assert.False(string.IsNullOrWhiteSpace(_driver.Title));
         }
 
